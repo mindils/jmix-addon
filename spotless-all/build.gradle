@@ -1,0 +1,31 @@
+plugins {
+    id 'com.diffplug.spotless' version '6.18.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+spotless {
+    java {
+        target '../app/src/main/java/**/*.java', '../app/src/test/java/**/*.java'
+        removeUnusedImports()
+        importOrder()
+        palantirJavaFormat()
+    }
+}
+
+def appProject = gradle.includedBuild('app')
+
+tasks.register('spotlessApplyAll') {
+    group = 'formatting'
+    description = 'Applies Spotless formatting to all projects'
+
+    dependsOn appProject.task(':spotlessApply')
+}
+
+tasks.named('spotlessApply').configure {
+    dependsOn 'spotlessApplyAll'
+}
+
+ext.jmixCompositeProjectRoot = true

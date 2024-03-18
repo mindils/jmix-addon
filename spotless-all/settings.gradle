@@ -1,0 +1,6 @@
+rootProject.name = 'spotless-all'
+includeBuild('../app') {
+    dependencySubstitution {
+        substitute(module('com.company:app')).using(project(':'))
+    }
+}
