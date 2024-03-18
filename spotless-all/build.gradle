@@ -8,7 +8,10 @@ repositories {
 
 spotless {
     java {
-        target '../app/src/main/java/**/*.java', '../app/src/test/java/**/*.java'
+        target '../app/src/main/java/**/*.java',
+                '../app/src/test/java/**/*.java',
+                '../add/src/main/java/**/*.java',
+                '../add/src/test/java/**/*.java'
         removeUnusedImports()
         importOrder()
         palantirJavaFormat()
@@ -16,12 +19,15 @@ spotless {
 }
 
 def appProject = gradle.includedBuild('app')
+def addProject = gradle.includedBuild('add')
+
 
 tasks.register('spotlessApplyAll') {
     group = 'formatting'
     description = 'Applies Spotless formatting to all projects'
 
     dependsOn appProject.task(':spotlessApply')
+    dependsOn addProject.task(':spotlessApply')
 }
 
 tasks.named('spotlessApply').configure {

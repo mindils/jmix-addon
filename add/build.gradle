@@ -1,0 +1,93 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "io.jmix.gradle:jmix-gradle-plugin:2.2.1.1"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:6.18.0"
+    }
+}
+plugins {
+    id 'com.diffplug.spotless' version '6.18.0'
+}
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'com.diffplug.spotless'
+
+spotless {
+    java {
+        target 'add/src/main/java/**/*.java', 'add/src/test/java/**/*.java',
+                'add-starter/src/main/java/**/*.java', 'add-starter/src/test/java/**/*.java'
+        removeUnusedImports()
+        importOrder()
+        palantirJavaFormat()
+    }
+}
+
+
+
+group = 'com.company'
+version = '0.0.1-SNAPSHOT'
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'io.jmix'
+    apply plugin: 'com.diffplug.spotless'
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://global.repo.jmix.io/repository/public'
+        }
+    }
+
+
+
+    jmix {
+        bomVersion = '2.2.1'
+        projectId = 'add'
+    }
+
+    group = this.group
+    version = this.version
+
+    def props = new Properties()
+    buildFile.withInputStream { props.load(it) }
+    def subArchivesBaseName = props.getProperty('archivesBaseName')
+    def archName = subArchivesBaseName.substring(1, subArchivesBaseName.length() - 1)
+
+    java {
+        withSourcesJar()
+    }
+
+    artifacts {
+        archives sourcesJar
+    }
+
+    publishing {
+        repositories {
+            maven {
+                url = 'https://myrepo/releases/'
+                credentials {
+                    username rootProject.hasProperty('uploadUser') ? rootProject['uploadUser'] : 'admin'
+                    password rootProject.hasProperty('uploadPassword') ? rootProject['uploadPassword'] : 'admin'
+                }
+                allowInsecureProtocol = true
+            }
+        }
+        publications {
+            javaMaven(MavenPublication) {
+                artifactId = archName
+                from components.java
+            }
+        }
+    }
+
+    // remove after https://youtrack.jetbrains.com/issue/IDEA-227215 is fixed
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+}

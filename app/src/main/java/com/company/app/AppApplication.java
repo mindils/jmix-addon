@@ -27,7 +27,8 @@ public class AppApplication implements AppShellConfigurator {
     @Autowired
     private Environment environment;
 
-    public static void main(String[] args) { SpringApplication.run(AppApplication.class, args);
+    public static void main(String[] args) {
+        SpringApplication.run(AppApplication.class, args);
     }
 
     @Bean
