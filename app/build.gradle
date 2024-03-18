@@ -6,7 +6,7 @@ plugins {
 
 spotless {
     java {
-        target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
+        target 'src/**/*.java'
         removeUnusedImports()
         importOrder()
         palantirJavaFormat()
